@@ -7,9 +7,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.extflightdelays.model.Airline;
 import it.polito.tdp.extflightdelays.model.Airport;
+import it.polito.tdp.extflightdelays.model.CoppiaAirport;
 import it.polito.tdp.extflightdelays.model.Flight;
 
 public class ExtFlightDelaysDAO {
@@ -37,9 +39,9 @@ public class ExtFlightDelaysDAO {
 		}
 	}
 
-	public List<Airport> loadAllAirports() {
+	public void loadAllAirports(Map<Integer, Airport> idMap) {
 		String sql = "SELECT * FROM airports";
-		List<Airport> result = new ArrayList<Airport>();
+		//List<Airport> result = new ArrayList<Airport>();
 
 		try {
 			Connection conn = ConnectDB.getConnection();
@@ -47,14 +49,16 @@ public class ExtFlightDelaysDAO {
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
+				if(!idMap.containsKey(rs.getInt("ID"))) {
 				Airport airport = new Airport(rs.getInt("ID"), rs.getString("IATA_CODE"), rs.getString("AIRPORT"),
 						rs.getString("CITY"), rs.getString("STATE"), rs.getString("COUNTRY"), rs.getDouble("LATITUDE"),
 						rs.getDouble("LONGITUDE"), rs.getDouble("TIMEZONE_OFFSET"));
-				result.add(airport);
+				idMap.put(airport.getId(), airport); 
+				}
 			}
 
 			conn.close();
-			return result;
+			//return result;
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -91,4 +95,62 @@ public class ExtFlightDelaysDAO {
 			throw new RuntimeException("Error Connection Database");
 		}
 	}
+	
+	/**
+	 * Airport tra loro collegati
+	 */
+	public List<CoppiaAirport> PartenzaDestinazione(Map<Integer, Airport> idMap) {
+		String sql="SELECT DISTINCT origin_airport_id, destination_airport_id FROM flights"; 
+		
+		List<CoppiaAirport> connessioni= new ArrayList<>(); 
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				CoppiaAirport coppia= new CoppiaAirport(idMap.get(rs.getInt("origin_airport_id")),
+						idMap.get(rs.getInt("destination_airport_id")));
+			
+				connessioni.add(coppia); 
+			}
+
+			conn.close();
+			return connessioni;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	
+	/**
+	 * Distanza media fra due Airport
+	 */
+	public int distanzaMedia(Airport partenza, Airport destinazione) {
+		String sql="SELECT avg(DISTANCE) as media FROM flights " + 
+				"WHERE origin_airport_id=? AND destination_airport_id=? "; 
+		
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, partenza.getId());
+			st.setInt(2,  destinazione.getId());
+			ResultSet rs = st.executeQuery();
+
+			rs.first(); 
+			int media= rs.getInt("media"); 
+			conn.close();
+			return media; 
+
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
 }

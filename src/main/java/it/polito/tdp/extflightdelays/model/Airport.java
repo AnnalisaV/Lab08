@@ -25,6 +25,9 @@ public class Airport {
 		this.timezoneOffset = timezoneOffset;
 	}
 
+	public Airport(int id) {
+		this.id=id; 
+	}
 	public int getId() {
 		return id;
 	}
