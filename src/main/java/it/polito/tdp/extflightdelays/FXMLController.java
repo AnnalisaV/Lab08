@@ -7,6 +7,7 @@ package it.polito.tdp.extflightdelays;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.extflightdelays.model.CoppiaAirport;
 import it.polito.tdp.extflightdelays.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -53,6 +54,14 @@ public class FXMLController {
     	this.model.analizza(dist);
     	txtResult.appendText("Grafo creato con "+this.model.nVertici()+" vertici e "+
     	this.model.nArchi()+"\n");
+    	
+    	txtResult.appendText("ELENCO ROTTE:\n");
+
+    	for(CoppiaAirport c : this.model.getCoppieAirport()) {
+
+    		txtResult.appendText(c.toString() + "\n");
+
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete

@@ -4,17 +4,18 @@ public class CoppiaAirport {
 
 	private Airport partenza; 
 	private Airport destinazione;
-	private double distanza; 
+	private double distanza; //valore medio
 	
 	
 	/**
 	 * @param partenza
 	 * @param arrivo
 	 */
-	public CoppiaAirport(Airport partenza, Airport arrivo) {
+	public CoppiaAirport(Airport partenza, Airport arrivo, double peso) {
 		super();
 		this.partenza = partenza;
 		this.destinazione = arrivo;
+		this.distanza= peso; 
 	}
 
 
@@ -74,6 +75,14 @@ public class CoppiaAirport {
 		} else if (!partenza.equals(other.partenza))
 			return false;
 		return true;
+	}
+
+
+	@Override
+	public String toString() {
+		return "CoppiaAirport con partenza " + partenza + ", destinazione " + destinazione + ", distanza " + distanza
+				+"\n";
+		
 	} 
 	
 	

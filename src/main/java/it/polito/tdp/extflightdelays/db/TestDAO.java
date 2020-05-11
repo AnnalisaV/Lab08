@@ -13,7 +13,7 @@ public class TestDAO {
 		System.out.println(dao.loadAllFlights().size());
 		Airport part= new Airport(217);
 		Airport arr= new Airport(269);
-		System.out.println(dao.distanzaMedia(part, arr)); 
+		//System.out.println(dao.PartenzaDestinazione(idMap)); 
 	}
 
 }

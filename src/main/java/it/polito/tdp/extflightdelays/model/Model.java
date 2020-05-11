@@ -22,7 +22,7 @@ public class Model {
 	
 	public Model() {
 		this.idMapAirport= new HashMap<>(); 
-		this.coppie= new ArrayList<>(new ExtFlightDelaysDAO().PartenzaDestinazione(idMapAirport)); 
+		 
 	}
 	
 	/**
@@ -39,15 +39,24 @@ public class Model {
 		
 		//Aggiungo gli archi 
 		for(CoppiaAirport c : dao.PartenzaDestinazione(this.idMapAirport)) {
-			int distanza= dao.distanzaMedia(c.getPartenza(), c.getDestinazione()); 
-			if (distanza > dist) {
-				Graphs.addEdge(this.grafo, c.getPartenza(),c.getDestinazione(), distanza); 
+			// posso collegarli?
+			if (c.getDistanza()>dist) {
+			DefaultWeightedEdge e= this.grafo.getEdge(c.getPartenza(), c.getDestinazione());
+			
+			if(e==null) {
+				//arco non esiste lo aggiungo
+				Graphs.addEdge(this.grafo, c.getPartenza(), c.getDestinazione(), c.getDistanza()); 
+	            }
+			else {
+				double peso= this.grafo.getEdgeWeight(e);
+				double pesoNuovo= (peso+c.getDistanza())/2;//voglio la media come peso 
+				grafo.setEdgeWeight(e, pesoNuovo);
+			}
+			}
+			//altrimenti non aggiungo nessun arco fra i due Airport	
 			}
 		}
 		
-		
-		
-	}
 	
 	public int nVertici(){
 		return this.grafo.vertexSet().size(); 
@@ -58,13 +67,17 @@ public class Model {
 		return this.grafo.edgeSet().size(); 
 	}
 
-	public String elencoArchi() {
-		String s=""; 
-		
-		for (DefaultWeightedEdge edge : this.grafo.edgeSet()) {
-		// non so come prendere il peso dell'arco
-	}
-		return s;
-	}
+	//non dao Dao perche' qui filtro sulla base della distanza che mi chiede l'utente
+	public List<CoppiaAirport> getCoppieAirport(){
+
+	    List<CoppiaAirport> coppie = new ArrayList<>();
+
+		for(DefaultWeightedEdge e : this.grafo.edgeSet()) {
+         coppie.add(new CoppiaAirport(this.grafo.getEdgeSource(e), 
+        		 this.grafo.getEdgeTarget(e), this.grafo.getEdgeWeight(e)));
+         }
+
+		return coppie;
 	 
+}
 }

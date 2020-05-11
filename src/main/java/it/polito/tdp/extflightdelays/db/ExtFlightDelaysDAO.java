@@ -97,10 +97,12 @@ public class ExtFlightDelaysDAO {
 	}
 	
 	/**
-	 * Airport tra loro collegati
+	 * Airport tra loro collegati con il rispettivo peso dell'arco
 	 */
 	public List<CoppiaAirport> PartenzaDestinazione(Map<Integer, Airport> idMap) {
-		String sql="SELECT DISTINCT origin_airport_id, destination_airport_id FROM flights"; 
+		String sql="SELECT origin_airport_id,destination_airport_id, AVG(DISTANCE) as media " + 
+				"FROM flights " + 
+				"group BY origin_airport_id, destination_airport_id "; 
 		
 		List<CoppiaAirport> connessioni= new ArrayList<>(); 
 		try {
@@ -109,8 +111,9 @@ public class ExtFlightDelaysDAO {
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
+			
 				CoppiaAirport coppia= new CoppiaAirport(idMap.get(rs.getInt("origin_airport_id")),
-						idMap.get(rs.getInt("destination_airport_id")));
+						idMap.get(rs.getInt("destination_airport_id")), rs.getDouble("media"));
 			
 				connessioni.add(coppia); 
 			}
@@ -126,31 +129,5 @@ public class ExtFlightDelaysDAO {
 	}
 	
 	
-	/**
-	 * Distanza media fra due Airport
-	 */
-	public int distanzaMedia(Airport partenza, Airport destinazione) {
-		String sql="SELECT avg(DISTANCE) as media FROM flights " + 
-				"WHERE origin_airport_id=? AND destination_airport_id=? "; 
-		
-		try {
-			Connection conn = ConnectDB.getConnection();
-			PreparedStatement st = conn.prepareStatement(sql);
-			st.setInt(1, partenza.getId());
-			st.setInt(2,  destinazione.getId());
-			ResultSet rs = st.executeQuery();
-
-			rs.first(); 
-			int media= rs.getInt("media"); 
-			conn.close();
-			return media; 
-
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Errore connessione al database");
-			throw new RuntimeException("Error Connection Database");
-		}
-	}
 	
 }
