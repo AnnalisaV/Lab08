@@ -103,7 +103,11 @@ public class ExtFlightDelaysDAO {
 		String sql="SELECT origin_airport_id,destination_airport_id, AVG(DISTANCE) as media " + 
 				"FROM flights " + 
 				"group BY origin_airport_id, destination_airport_id "; 
-		
+		//altra possibilita' di query
+		/*String sql ="SELECT origin_airport_id,destination_airport_id, AVG(DISTANCE) as media 
+		 *             "FROM flights " + 
+				"group BY origin_airport_id, destination_airport_id "
+				"HAVING media>? "; */
 		List<CoppiaAirport> connessioni= new ArrayList<>(); 
 		try {
 			Connection conn = ConnectDB.getConnection();
