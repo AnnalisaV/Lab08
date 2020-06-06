@@ -7,6 +7,7 @@ package it.polito.tdp.extflightdelays;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.extflightdelays.model.CoppiaAirports;
 import it.polito.tdp.extflightdelays.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,7 +36,26 @@ public class FXMLController {
 
     @FXML
     void doAnalizzaAeroporti(ActionEvent event) {
-    	//TODO
+    	txtResult.clear();
+    	
+    	if (this.distanzaMinima.getLength()==0) {
+    		txtResult.appendText("ERRORE : inserire miglie minime\n");
+    		return;
+    	}
+    	double miglia=0.0; 
+    	try {
+    		miglia= Double.parseDouble(this.distanzaMinima.getText()); 
+    	}
+    	catch(NumberFormatException nfe) {
+    		txtResult.appendText("ERRORE : inserire valore miglia valido");
+    		return; 
+    	}
+    	model.creaGrafo(miglia);
+    	txtResult.appendText("Grafo creato con "+model.nVertex()+" vertex and "+model.nArchi()+"edges\n\n");
+ 
+    	for (CoppiaAirports c : this.model.getAirportsDelGrafo()) {
+    		txtResult.appendText(c.toString()+"\n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
